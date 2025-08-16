@@ -1,0 +1,28 @@
+name: Patch Dist Build
+
+on:
+  workflow_dispatch:   # Run manually from Actions tab
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Unzip dist
+        run: unzip dist-build.zip -d dist
+
+      - name: Patch vite.config.js
+        run: |
+          echo "import { defineConfig } from 'vite'; export default defineConfig({ base: './' });" > dist/vite.config.js
+
+      - name: Repack patched zip
+        run: |
+          zip -r dist-build-patched.zip dist
+
+      - name: Upload patched dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-build-patched
+          path: dist-build-patched.zip
